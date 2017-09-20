@@ -1,0 +1,224 @@
+%Lab 1 - Robin Clerc 20/09/2017
+clear all;
+close all;
+clc;
+
+% Exercise 1 : Images and color tables
+
+% Question 1
+figure(1)
+[trees_tif, map_trees_tif] = imread('./images/trees.tif');
+image(trees_tif);
+
+figure(2)
+[lena_tif, map_lena_tif] = imread('./images/lena.tif');
+image(lena_tif);
+
+% Question 2
+
+figure(3)
+trees_tif_gray = ind2gray(trees_tif, map_trees_tif);
+imshow(trees_tif_gray);
+
+figure(4)
+lena_tif_gray = rgb2gray(lena_tif);
+imshow(lena_tif_gray);
+
+figure(5)
+% Inverting the color table of the gray image TODO try with another color
+% map
+trees_tif_gray_inv = 255-trees_tif_gray;
+imshow(trees_tif_gray_inv);
+
+figure(51)
+% Inverting the color table of the colored image
+trees_tif_inv = imcomplement(trees_tif);
+imshow(trees_tif_inv);
+
+figure(6)
+lena_tif_gray_inv = imcomplement(lena_tif_gray);
+imshow(lena_tif_gray_inv);
+
+% Question 3
+figure(7)
+map_trees_tif_modified = modify_color_map(map_trees_tif, 0.5);
+colormap(map_trees_tif_modified);
+image(trees_tif);
+
+figure(8)
+map_trees_tif_modified = modify_color_map(map_trees_tif, 2);
+colormap(map_trees_tif_modified);
+image(trees_tif);
+
+% The gamma correction is usefull to control the brightness of a picture
+
+
+% Question 4
+
+% For the indexed image
+figure(9)
+chess_motif = eye(2)+1; % In Matlab indexes begin at 1
+chess_board_indexed = repmat(chess_motif,4);
+chess_blue_yellow_color_map = [0 0 1; 1 1 0];
+colormap(chess_blue_yellow_color_map);
+image(chess_board_indexed);
+imwrite(chess_board_indexed,chess_blue_yellow_color_map,'chess_board_indexed.tif')
+
+
+% For the truecolor image
+figure(10)
+chess_motif_true = zeros(2,2,3);
+chess_motif_true(1,1,3) = 1;
+chess_motif_true(2,2,3) = 1;
+chess_motif_true(1,2,1) = 1;
+chess_motif_true(1,2,2) = 1;
+chess_motif_true(2,1,1) = 1;
+chess_motif_true(2,1,2) = 1;
+chess_board_true = repmat(chess_motif_true,4);
+image(chess_board_true);
+imwrite(chess_board_true,'chess_board_true.tif')
+
+% Exercise 2 : Image quantization
+figure(11)
+lena_png = imread('./images/lena-y.png');
+imshow(lena_png);
+
+
+for i=1:8
+    figure(12+i)
+    gray_levels = 2^i;
+    quantized_image = quantization(lena_png,gray_levels);
+    reconstructed_image = reconstruction(quantized_image,gray_levels);
+    imshow(reconstructed_image)
+end
+% Between 16 and 8
+
+
+% Exercise 3 : filtering
+
+% Question 1
+A = [0.0357 ; 0.2411 ; 0.4464 ; 0.2411 ; 0.0357];
+B = [0.0357 0.2411 0.4464 0.2411 0.0357];
+H = A*B;
+figure(21)
+colormap(parula(64));
+freqz2(H);
+axis ([-1 1 -1 1 0 1]);
+% It is low pass it probably will erase details
+
+% Question 2
+
+figure(22)
+gold_text_png = imread('./images/gold-text.png');
+imshow(gold_text_png);
+gold_text_filtered = imfilter (gold_text_png, H);
+figure(23);
+imshow(gold_text_filtered);
+% It was indeed a blurring filter
+
+
+% Question 3
+
+H2 = 1/6 * [-1 -4 -1; -4 26 -4; -1 -4 -1];
+figure(24)
+colormap(parula(64));
+freqz2(H2);
+figure(25);
+mesh(H2);
+% We see a high pass, it will let pass details
+figure(26)
+gold_text_refiltered = imfilter(gold_text_filtered,H2);
+imshow(gold_text_refiltered);
+% It is a sharpening filter but we cannot go back to the original one
+
+
+
+% Exercise 4 : Correlation
+
+figure(27)
+g_letter_png = imread('./images/g-letter.png');
+imshow(g_letter_png);
+
+
+
+figure(28)
+fft_gold_text_png = fft2(gold_text_png);
+imagesc(abs(fftshift(fft_gold_text_png)));
+
+figure(29)
+fft_g_letter_png = fft2(g_letter_png);
+imagesc(abs(fftshift(fft_g_letter_png)));
+
+spatial_corr = conv2(g_letter_png, gold_text_png);
+
+figure(30)
+imshow(spatial_corr)
+
+
+
+
+% Exercise 4 : Resampling
+
+figure(40)
+[sub4_tif, map_sub4_tif] = imread('./images/sub4.tif');
+imshow(sub4_tif);
+
+figure(41)
+sub4_downsampled2 = downsample_custom(sub4_tif,2);
+imshow(sub4_downsampled2);
+
+figure(42)
+sub4_downsampled4 = downsample_custom(sub4_tif,4);
+imshow(sub4_downsampled4);
+
+% Looks like what we want. We still can recognize
+
+
+
+% Exercise 6 : Phase and magnitude of the 2DFT
+% Question 1
+
+figure(43)
+lena_png;
+fft_lena = fft2(lena_png);
+imagesc(abs(fftshift(fft_lena)));
+
+figure(44)
+fft_lena_inv = real(fft_lena)
+imagesc(abs(fftshift(fft_lena_inv)));
+
+
+figure(45)
+fft_lena_imag = imag(fft_lena)
+imagesc(abs(fftshift(fft_lena_imag)));
+
+% It looks like the inverse but not the imaginary part because there is no
+% periodicity
+
+% Question 2 TODO
+
+
+% Exercise 7 : Phase and magnitude of the 2DFT
+figure(50)
+weber_matrix = weber(10,50,100)
+im
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
