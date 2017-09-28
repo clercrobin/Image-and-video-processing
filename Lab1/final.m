@@ -8,7 +8,7 @@ clc;
 % Question 1
 figure(1)
 [trees_tif, map_trees_tif] = imread('./images/trees.tif');
-image(trees_tif);
+imshow(trees_tif,map_trees_tif); % Warning : image does not support 2 arguments 
 
 figure(2)
 [lena_tif, map_lena_tif] = imread('./images/lena.tif');
@@ -16,9 +16,11 @@ image(lena_tif);
 
 % Question 2
 
+% Getting the gray images
 figure(3)
 trees_tif_gray = ind2gray(trees_tif, map_trees_tif);
 imshow(trees_tif_gray);
+
 
 figure(4)
 lena_tif_gray = rgb2gray(lena_tif);
@@ -31,12 +33,14 @@ trees_tif_gray_inv = 255-trees_tif_gray;
 imshow(trees_tif_gray_inv);
 
 figure(51)
-% Inverting the color table of the colored image
-trees_tif_inv = imcomplement(trees_tif);
+% Inverting the color table of the colored image and then convert them to
+% gray
+trees_tif_map_inv = 1 - map_trees_tif;
+trees_tif_inv = ind2gray(trees_tif, trees_tif_map_inv);
 imshow(trees_tif_inv);
 
 figure(6)
-lena_tif_gray_inv = imcomplement(lena_tif_gray);
+lena_tif_gray_inv = 255-(lena_tif_gray);
 imshow(lena_tif_gray_inv);
 
 % Question 3
@@ -78,6 +82,11 @@ chess_board_true = repmat(chess_motif_true,4);
 image(chess_board_true);
 imwrite(chess_board_true,'chess_board_true.tif')
 
+%Lab 1 - Robin Clerc 20/09/2017
+clear all;
+close all;
+clc;
+
 % Exercise 2 : Image quantization
 figure(11)
 lena_png = imread('./images/lena-y.png');
@@ -88,8 +97,7 @@ for i=1:8
     figure(12+i)
     gray_levels = 2^i;
     quantized_image = quantization(lena_png,gray_levels);
-    reconstructed_image = reconstruction(quantized_image,gray_levels);
-    imshow(reconstructed_image)
+    imshow(quantized_image./256)
 end
 % Between 16 and 8
 
